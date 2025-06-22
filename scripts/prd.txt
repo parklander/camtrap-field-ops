@@ -1,0 +1,89 @@
+<context>
+# Overview  
+The CamTrap Field Ops App is a mobile-first Progressive Web App (PWA) built with Next.js, deployed on Vercel, and backed by Supabase for data storage and authentication. It supports field technicians in deploying, maintaining, and retrieving camera traps used in ecological and conservation research. It ensures offline data capture, structured metadata collection, and reliable synchronization. The app addresses challenges like inconsistent data, limited GPS/photo context, and the difficulty of coordinating remote fieldwork.
+
+# Core Features
+
+1. **Deployment Mode**
+
+   * Enables selection of predefined or ad-hoc deployment locations.
+   * Captures camera metadata, GPS location, and deployment photos.
+   * Essential for accurate field documentation and traceability.
+
+2. **Maintenance Visit Logging**
+
+   * Records checks on camera status, battery levels, SD cards.
+   * Logs actions like replacements, issues, and timestamps.
+   * Provides historical insights and data integrity across visits.
+
+3. **Collection Mode**
+
+   * Marks a deployment as completed.
+   * Records collection condition and photo evidence.
+   * Maintains end-to-end lifecycle for each deployment.
+
+4. **Recording Gaps Logging**
+
+   * Allows technicians to log downtime reasons (e.g., dead batteries, SD card full).
+   * Includes estimated duration and optional photos.
+   * Enhances data quality monitoring.
+
+5. **Camera Timeline Viewer**
+
+   * Displays a timeline of active/inactive periods.
+   * Marks visits and gaps visually.
+   * Supports QA, troubleshooting, and deployment planning.
+
+6. **Offline Functionality & Sync**
+
+   * Stores data locally when offline.
+   * Syncs to Supabase when online.
+   * Critical for remote field environments.
+
+     </context>
+
+<PRD>
+# Technical Architecture  
+- **System Components**: Next.js frontend (PWA), Supabase backend (database, auth, storage).
+- **Data Models**: Deployments, Locations, Maintenance Visits, Recording Gaps, Media.
+- **APIs and Integrations**: Supabase client for real-time sync and file uploads.
+- **Infrastructure**: Hosted on Vercel, using Supabase for persistent backend needs.
+
+# Development Roadmap
+
+## MVP Requirements
+
+* Authentication and user session handling (Supabase)
+* Deployment creation and logging with GPS/photo
+* Maintenance visit form with battery/SD checks
+* Collection recording and close-out
+* Offline mode and data sync
+
+## Future Enhancements
+
+* Camera timeline viewer with data overlays
+* Recording gaps module and auto-detection
+* Project/team dashboards
+* Data export to Camtrap DP or Wildlife Insights formats
+
+# Logical Dependency Chain
+
+* **Foundation**: Supabase setup (tables, auth), PWA scaffold with offline-first capabilities.
+* **Core Flows**: Deployment creation → Maintenance visit logging → Collection flow.
+* **Sync & Storage**: Ensure local-first write, queued sync on reconnect.
+* **Enhancements**: Add timeline viewer, gap logger, and UI polish.
+
+# Risks and Mitigations
+
+* **Offline Sync Complexity**: Mitigate with local caching libs (e.g., IndexedDB via Dexie).
+* **GPS/Camera Permissions**: Require robust permissions checks.
+* **MVP Scoping**: Anchor MVP to deployment-maintenance-collection loop before adding viewer and gap tracking.
+* **User Training**: Use a streamlined UI and optional training module to reduce field errors.
+
+# Appendix
+
+* Based on Camtrap DP and Wildlife Insights metadata standards.
+* Informed by common practices in camera trap research.
+* PWA choice driven by need for field access, battery efficiency, and sync flexibility.
+
+  </PRD>
