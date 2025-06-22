@@ -57,7 +57,7 @@ export default function SignupForm() {
       <div className="max-w-md mx-auto mt-8 p-6 bg-green-50 border border-green-200 rounded-lg">
         <h2 className="text-2xl font-bold mb-4 text-center text-green-800">Check Your Email</h2>
         <p className="text-green-700 text-center">
-          We've sent you a confirmation email. Please check your inbox and click the link to verify your account.
+          We&apos;ve sent you a confirmation email. Please check your inbox and click the link to verify your account.
         </p>
       </div>
     );
