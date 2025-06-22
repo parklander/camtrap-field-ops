@@ -28,10 +28,20 @@ export default function LoginForm() {
     setLoading(true);
     setError(null);
 
-    const { error } = await signInWithGoogle();
-    
-    if (error) {
-      setError(error.message);
+    try {
+      console.log('Starting Google OAuth flow...');
+      const { error } = await signInWithGoogle();
+      
+      if (error) {
+        console.error('Google OAuth error:', error);
+        setError(`OAuth Error: ${error.message}`);
+        setLoading(false);
+      } else {
+        console.log('Google OAuth initiated successfully');
+      }
+    } catch (err) {
+      console.error('Unexpected error during Google OAuth:', err);
+      setError('Unexpected error during authentication');
       setLoading(false);
     }
   };
