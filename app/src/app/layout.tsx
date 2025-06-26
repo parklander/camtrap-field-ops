@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
+import { ConnectivityInitializer } from "@/components/ConnectivityInitializer";
+import { ConnectivityStatus } from "@/components/ConnectivityStatus";
+import ProjectSelector from "@/components/ProjectSelector";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -47,7 +50,15 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>
-          {children}
+          <ConnectivityInitializer />
+          <ConnectivityStatus />
+          <header className="flex items-center justify-between px-4 py-2 border-b bg-white">
+            <h1 className="text-xl font-bold text-gray-900">CamTrap Field Ops</h1>
+            <ProjectSelector />
+          </header>
+          <main>
+            {children}
+          </main>
         </AuthProvider>
       </body>
     </html>

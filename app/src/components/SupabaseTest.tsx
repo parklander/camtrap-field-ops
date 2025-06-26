@@ -17,8 +17,8 @@ export default function SupabaseTest() {
       setStatus('Testing connection...')
       setError(null)
       
-      // Test the connection by getting the current user session
-      const { error } = await supabase.auth.getSession()
+      // Make a real network request to Supabase
+      const { error } = await supabase.from('projects').select('*').limit(1)
       
       if (error) {
         throw error
