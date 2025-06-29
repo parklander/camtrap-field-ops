@@ -3,9 +3,9 @@
 import { useAuth } from '@/lib/auth-context';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import SupabaseStatusIndicator from '@/components/SupabaseTest';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import type { Deployment } from '@/lib/db';
 
 function MainContent() {
   const { user, signOut } = useAuth();
@@ -17,7 +17,7 @@ function MainContent() {
     async function fetchActiveDeployments() {
       try {
         const deployments = await (await import('@/lib/data-service')).DataService.getDeployments();
-        const active = deployments.filter((d: unknown) => !(d as any).deployment_end).length;
+        const active = deployments.filter((d: Deployment) => !d.deployment_end).length;
         setActiveDeployments(active);
       } catch {
         setActiveDeployments(null);

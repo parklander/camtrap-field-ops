@@ -6,7 +6,7 @@ import { DataService } from "@/lib/data-service";
 import type { Deployment, Location } from "@/lib/db";
 import mapboxgl from 'mapbox-gl';
 import { MapPinPlus, Download } from 'lucide-react';
-import Supercluster, { PointFeature, AnyProps } from 'supercluster';
+import Supercluster, { PointFeature } from 'supercluster';
 import Link from 'next/link';
 import { forward as mgrsForward } from 'mgrs';
 

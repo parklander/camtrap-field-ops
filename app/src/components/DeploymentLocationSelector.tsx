@@ -228,7 +228,7 @@ export default function DeploymentLocationSelector({ onDeploymentCreated }: { on
                     longitude = pt[0];
                     latitude = pt[1];
                   }
-                } catch (err) {
+                } catch {
                   setError('Invalid MGRS coordinate');
                   return;
                 }
