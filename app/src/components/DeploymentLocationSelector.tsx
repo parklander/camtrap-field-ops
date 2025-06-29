@@ -126,8 +126,8 @@ export default function DeploymentLocationSelector({ onDeploymentCreated }: { on
       setShowForm(false);
       setSelectedLocationId('');
       if (onDeploymentCreated) onDeploymentCreated();
-    } catch (err: any) {
-      setError(err.message || 'Failed to save deployment');
+    } catch (err: unknown) {
+      setError((err as Error)?.message || 'Failed to save deployment');
     } finally {
       setSaving(false);
     }

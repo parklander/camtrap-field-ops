@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { DataService } from "@/lib/data-service";
 import type { Deployment } from "@/lib/db";
 import type { MaintenanceVisit } from "@/lib/db";
 import mapboxgl from 'mapbox-gl';
-import { Camera, NotebookPen } from 'lucide-react';
+import { NotebookPen } from 'lucide-react';
 import React from 'react';
 import Link from 'next/link';
 
@@ -14,9 +14,7 @@ mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_CAMTRAP_TOKEN || '';
 
 export default function DeploymentDetailPage({ params }: { params: { deployment_id: string } }) {
   const router = useRouter();
-  // Unwrap params using React.use for Next.js 14+
-  const unwrappedParams = React.use(params as any) as { deployment_id?: string };
-  const deployment_id = unwrappedParams?.deployment_id;
+  const deployment_id = params?.deployment_id;
   const [deployment, setDeployment] = useState<Deployment | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -182,7 +180,7 @@ export default function DeploymentDetailPage({ params }: { params: { deployment_
                       setCameraRepositioned(false);
                       setCameraCleaned(false);
                       setCameraRepaired(false);
-                    } catch (err: any) {
+                    } catch {
                       setVisitError('Failed to log maintenance visit.');
                     }
                   }}
@@ -199,7 +197,7 @@ export default function DeploymentDetailPage({ params }: { params: { deployment_
                   <select
                     className="mb-4 p-2 border rounded w-full"
                     value={visitType}
-                    onChange={e => setVisitType(e.target.value as any)}
+                    onChange={e => setVisitType(e.target.value as 'deployment' | 'maintenance' | 'retrieval' | 'emergency')}
                     required
                   >
                     <option value="deployment">Deployment</option>

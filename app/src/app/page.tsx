@@ -17,7 +17,7 @@ function MainContent() {
     async function fetchActiveDeployments() {
       try {
         const deployments = await (await import('@/lib/data-service')).DataService.getDeployments();
-        const active = deployments.filter((d: any) => !d.deployment_end).length;
+        const active = deployments.filter((d: unknown) => !(d as any).deployment_end).length;
         setActiveDeployments(active);
       } catch {
         setActiveDeployments(null);

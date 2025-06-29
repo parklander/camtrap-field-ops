@@ -1,13 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import { DataService } from "@/lib/data-service";
 import type { MaintenanceVisit } from "@/lib/db";
 import Link from "next/link";
 
 export default function MaintenanceVisitDetailPage() {
-  const router = useRouter();
   const params = useParams();
   const { deployment_id, visit_id } = params as { deployment_id: string; visit_id: string };
   const [visit, setVisit] = useState<MaintenanceVisit | null>(null);

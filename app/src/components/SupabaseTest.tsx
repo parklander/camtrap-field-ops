@@ -24,7 +24,7 @@ export default function SupabaseStatusIndicator() {
         setStatus('ok')
         setMessage('Supabase connection is healthy.')
       }
-    } catch (err) {
+    } catch {
       setStatus('error')
       setMessage('Supabase connection failed!')
     }

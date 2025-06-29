@@ -1,5 +1,5 @@
 import { db, Deployment, Location, MaintenanceVisit, Project } from './db';
-import { SyncQueueService, SyncAction } from './sync-queue';
+import { SyncQueueService } from './sync-queue';
 import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase client
@@ -261,13 +261,13 @@ export class DataService {
       return;
     }
     if (data) {
-      const mapped = data.map((loc: any) => ({
-        location_id: loc.location_id,
-        project_id: loc.project_id,
-        location_name: loc.location_name,
-        latitude: loc.latitude,
-        longitude: loc.longitude,
-        notes: loc.location_comments || undefined,
+      const mapped = data.map((loc: unknown) => ({
+        location_id: (loc as any).location_id,
+        project_id: (loc as any).project_id,
+        location_name: (loc as any).location_name,
+        latitude: (loc as any).latitude,
+        longitude: (loc as any).longitude,
+        notes: (loc as any).location_comments || undefined,
       }));
       await db.locations.bulkPut(mapped);
     }

@@ -90,9 +90,10 @@ export class ConnectivityService {
   /**
    * Process a single sync queue item
    */
-  private static async processSyncItem(item: any): Promise<void> {
+  private static async processSyncItem(item: unknown): Promise<void> {
+    const typedItem = item as { table: string };
     try {
-      switch (item.table) {
+      switch (typedItem.table) {
         case 'deployments':
           await this.syncDeployment(item);
           break;
@@ -103,10 +104,10 @@ export class ConnectivityService {
           await this.syncMaintenanceVisit(item);
           break;
         default:
-          console.warn(`Unknown table type: ${item.table}`);
+          console.warn(`Unknown table type: ${typedItem.table}`);
       }
     } catch (error) {
-      console.error(`Failed to sync ${item.table} item:`, error);
+      console.error(`Failed to sync ${typedItem.table} item:`, error);
       throw error; // Re-throw to stop the sync process
     }
   }
@@ -114,21 +115,22 @@ export class ConnectivityService {
   /**
    * Sync a deployment item
    */
-  private static async syncDeployment(item: any): Promise<void> {
+  private static async syncDeployment(item: unknown): Promise<void> {
+    const typedItem = item as { action: string; data: unknown };
     const { createClient } = await import('@supabase/supabase-js');
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    switch (item.action) {
+    switch (typedItem.action) {
       case 'create':
-        await supabase.from('deployments').insert([item.data]);
+        await supabase.from('deployments').insert([typedItem.data]);
         break;
       case 'update':
-        await supabase.from('deployments').update(item.data).eq('id', item.data.id);
+        await supabase.from('deployments').update(typedItem.data).eq('id', (typedItem.data as { id: string }).id);
         break;
       case 'delete':
-        await supabase.from('deployments').delete().eq('id', item.data.id);
+        await supabase.from('deployments').delete().eq('id', (typedItem.data as { id: string }).id);
         break;
     }
   }
@@ -136,21 +138,22 @@ export class ConnectivityService {
   /**
    * Sync a location item
    */
-  private static async syncLocation(item: any): Promise<void> {
+  private static async syncLocation(item: unknown): Promise<void> {
+    const typedItem = item as { action: string; data: unknown };
     const { createClient } = await import('@supabase/supabase-js');
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    switch (item.action) {
+    switch (typedItem.action) {
       case 'create':
-        await supabase.from('locations').insert([item.data]);
+        await supabase.from('locations').insert([typedItem.data]);
         break;
       case 'update':
-        await supabase.from('locations').update(item.data).eq('id', item.data.id);
+        await supabase.from('locations').update(typedItem.data).eq('id', (typedItem.data as { id: string }).id);
         break;
       case 'delete':
-        await supabase.from('locations').delete().eq('id', item.data.id);
+        await supabase.from('locations').delete().eq('id', (typedItem.data as { id: string }).id);
         break;
     }
   }
@@ -158,21 +161,22 @@ export class ConnectivityService {
   /**
    * Sync a maintenance visit item
    */
-  private static async syncMaintenanceVisit(item: any): Promise<void> {
+  private static async syncMaintenanceVisit(item: unknown): Promise<void> {
+    const typedItem = item as { action: string; data: unknown };
     const { createClient } = await import('@supabase/supabase-js');
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    switch (item.action) {
+    switch (typedItem.action) {
       case 'create':
-        await supabase.from('maintenance_visits').insert([item.data]);
+        await supabase.from('maintenance_visits').insert([typedItem.data]);
         break;
       case 'update':
-        await supabase.from('maintenance_visits').update(item.data).eq('id', item.data.id);
+        await supabase.from('maintenance_visits').update(typedItem.data).eq('id', (typedItem.data as { id: string }).id);
         break;
       case 'delete':
-        await supabase.from('maintenance_visits').delete().eq('id', item.data.id);
+        await supabase.from('maintenance_visits').delete().eq('id', (typedItem.data as { id: string }).id);
         break;
     }
   }

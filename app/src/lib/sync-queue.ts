@@ -3,7 +3,7 @@ import { db, SyncQueueItem } from './db';
 export interface SyncAction {
   table: string;
   action: 'create' | 'update' | 'delete';
-  data: any;
+  data: unknown;
   recordId?: string;
 }
 

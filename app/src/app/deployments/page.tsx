@@ -5,8 +5,8 @@ import DeploymentLocationSelector from "@/components/DeploymentLocationSelector"
 import { DataService } from "@/lib/data-service";
 import type { Deployment, Location } from "@/lib/db";
 import mapboxgl from 'mapbox-gl';
-import { MapPinPlus, Download, ChevronDown } from 'lucide-react';
-import Supercluster from 'supercluster';
+import { MapPinPlus, Download } from 'lucide-react';
+import Supercluster, { PointFeature, AnyProps } from 'supercluster';
 import Link from 'next/link';
 import { forward as mgrsForward } from 'mgrs';
 
@@ -227,11 +227,17 @@ export default function DeploymentsPage() {
     markersRef.current = [];
 
     // Create GeoJSON features from deployments
-    const points = deployments
+    const points: PointFeature<{
+      deployment: Deployment;
+      cluster: boolean;
+      deployment_id: string;
+      location_name?: string;
+      camera_id?: string;
+    }>[] = deployments
       .filter(dep => typeof dep.longitude === 'number' && typeof dep.latitude === 'number')
-      .map((dep, index) => ({
+      .map((dep) => ({
         type: 'Feature' as const,
-        properties: { 
+        properties: {
           deployment: dep,
           cluster: false,
           deployment_id: dep.deployment_id,
@@ -249,7 +255,7 @@ export default function DeploymentsPage() {
       radius: 40,
       maxZoom: 16
     });
-    clusterRef.current.load(points as any);
+    clusterRef.current.load(points);
 
     const updateMarkers = () => {
       if (!mapRef.current || !clusterRef.current) return;
@@ -273,9 +279,9 @@ export default function DeploymentsPage() {
       clusters.forEach(cluster => {
         const [longitude, latitude] = cluster.geometry.coordinates;
         
-        if ((cluster.properties as any).cluster) {
+        if ((cluster.properties as { cluster?: boolean }).cluster) {
           // This is a cluster
-          const count = (cluster.properties as any).point_count;
+          const count = (cluster.properties as { point_count: number }).point_count;
           const el = createClusterMarker(count);
           
           const marker = new mapboxgl.Marker({ element: el })
@@ -297,7 +303,7 @@ export default function DeploymentsPage() {
           markersRef.current.push(marker);
         } else {
           // This is an individual deployment
-          const dep = (cluster.properties as any).deployment;
+          const dep = (cluster.properties as { deployment: Deployment }).deployment;
           const el = createDeploymentMarker();
           
           const marker = new mapboxgl.Marker({ element: el })

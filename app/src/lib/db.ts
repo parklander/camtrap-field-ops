@@ -93,8 +93,15 @@ export interface SyncQueueItem {
   id?: number;
   table: string;
   action: 'create' | 'update' | 'delete';
-  data: any;
+  data: unknown;
   timestamp: number;
+}
+
+export interface SyncAction {
+  table: string;
+  action: 'create' | 'update' | 'delete';
+  data: unknown;
+  recordId?: string;
 }
 
 export interface Project {
