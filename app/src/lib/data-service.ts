@@ -21,22 +21,28 @@ export class DataService {
   /**
    * Create a new deployment
    */
-  static async createDeployment(deployment: Omit<Deployment, 'id'>): Promise<Deployment> {
+  static async createDeployment(deployment: Omit<Deployment, 'deployment_id' | 'created_at' | 'updated_at'>): Promise<Deployment> {
+    // Generate a new deployment_id
     const newDeployment: Deployment = {
       ...deployment,
-      id: crypto.randomUUID(),
+      deployment_id: crypto.randomUUID(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     };
 
     if (this.checkOnlineStatus()) {
       try {
-        // Try to sync with Supabase first
+        // Map to Supabase schema (no changes needed, already matches)
         const { data, error } = await supabase
           .from('deployments')
           .insert([newDeployment])
           .select()
           .single();
 
-        if (error) throw error;
+        if (error) {
+          console.error('Supabase error:', error);
+          throw error;
+        }
 
         // Store locally as well
         await db.deployments.add(data);
@@ -245,6 +251,45 @@ export class DataService {
   }
 
   /**
+   * Sync locations from Supabase to local Dexie
+   */
+  static async syncLocationsFromSupabase(): Promise<void> {
+    if (!this.checkOnlineStatus()) return;
+    const { data, error } = await supabase.from('locations').select('*');
+    if (error) {
+      console.error('Failed to fetch locations from Supabase:', error);
+      return;
+    }
+    if (data) {
+      const mapped = data.map((loc: any) => ({
+        location_id: loc.location_id,
+        project_id: loc.project_id,
+        location_name: loc.location_name,
+        latitude: loc.latitude,
+        longitude: loc.longitude,
+        notes: loc.location_comments || undefined,
+      }));
+      await db.locations.bulkPut(mapped);
+    }
+  }
+
+  /**
+   * Sync deployments from Supabase to local Dexie
+   */
+  static async syncDeploymentsFromSupabase(): Promise<void> {
+    if (!this.checkOnlineStatus()) return;
+    const { data, error } = await supabase.from('deployments').select('*');
+    if (error) {
+      console.error('Failed to fetch deployments from Supabase:', error);
+      return;
+    }
+    if (data) {
+      // No mapping needed, schema matches
+      await db.deployments.bulkPut(data);
+    }
+  }
+
+  /**
    * Sync projects from Supabase to local Dexie
    */
   static async syncProjectsFromSupabase(): Promise<void> {
@@ -257,6 +302,85 @@ export class DataService {
     if (data) {
       await db.projects.bulkPut(data);
     }
+    // Also sync locations and deployments after projects
+    await this.syncLocationsFromSupabase();
+    await this.syncDeploymentsFromSupabase();
+  }
+
+  /**
+   * Get all locations (from local storage)
+   */
+  static async getLocations(): Promise<Location[]> {
+    return await db.locations.toArray();
+  }
+
+  /**
+   * Create a new location
+   */
+  static async createLocation(location: Location): Promise<void> {
+    if (this.checkOnlineStatus()) {
+      try {
+        const supabaseLocation = {
+          ...location,
+          location_comments: location.location_comments,
+        };
+        const { data, error } = await supabase
+          .from('locations')
+          .insert([supabaseLocation])
+          .select()
+          .single();
+        if (error) throw error;
+        await db.locations.add({ ...data });
+        return;
+      } catch (error) {
+        console.error('Failed to create location online, falling back to offline:', error);
+        // Fall back to offline mode
+      }
+    }
+    await db.locations.add(location);
+    // Optionally, queue for sync if offline (implement if needed)
+  }
+
+  /**
+   * Get all maintenance visits (from local storage)
+   */
+  static async getMaintenanceVisits(): Promise<MaintenanceVisit[]> {
+    return await db.maintenance_visits.toArray();
+  }
+
+  /**
+   * Create a new maintenance visit
+   */
+  static async createMaintenanceVisit(visit: Omit<MaintenanceVisit, 'visit_id' | 'created_at' | 'updated_at'>): Promise<MaintenanceVisit> {
+    const now = new Date().toISOString();
+    const newVisit: MaintenanceVisit = {
+      ...visit,
+      visit_id: crypto.randomUUID(),
+      created_at: now,
+      updated_at: now,
+    };
+    if (this.checkOnlineStatus()) {
+      try {
+        const { data, error } = await supabase
+          .from('maintenance_visits')
+          .insert([newVisit])
+          .select()
+          .single();
+        if (error) throw error;
+        await db.maintenance_visits.add(data);
+        return data;
+      } catch (error) {
+        console.error('Failed to create maintenance visit online, falling back to offline:', error);
+      }
+    }
+    // Offline mode: store locally and queue for sync
+    await db.maintenance_visits.add(newVisit);
+    await SyncQueueService.addToQueue({
+      table: 'maintenance_visits',
+      action: 'create',
+      data: newVisit,
+    });
+    return newVisit;
   }
 
   // Similar methods for locations and maintenance visits...

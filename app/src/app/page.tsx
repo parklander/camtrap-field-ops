@@ -2,10 +2,29 @@
 
 import { useAuth } from '@/lib/auth-context';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
-import SupabaseTest from '@/components/SupabaseTest';
+import SupabaseStatusIndicator from '@/components/SupabaseTest';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 function MainContent() {
   const { user, signOut } = useAuth();
+  const [activeDeployments, setActiveDeployments] = useState<number | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    // Fetch deployments and count active ones (no end date)
+    async function fetchActiveDeployments() {
+      try {
+        const deployments = await (await import('@/lib/data-service')).DataService.getDeployments();
+        const active = deployments.filter((d: any) => !d.deployment_end).length;
+        setActiveDeployments(active);
+      } catch {
+        setActiveDeployments(null);
+      }
+    }
+    fetchActiveDeployments();
+  }, []);
 
   const handleSignOut = async () => {
     await signOut();
@@ -21,12 +40,15 @@ function MainContent() {
               <h1 className="text-xl font-semibold text-gray-900">CamTrap Field Ops</h1>
               <p className="text-sm text-gray-500">Welcome, {user?.email}</p>
             </div>
-            <button
-              onClick={handleSignOut}
-              className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
-            >
-              Sign Out
-            </button>
+            <div className="flex items-center gap-4">
+              <SupabaseStatusIndicator />
+              <button
+                onClick={handleSignOut}
+                className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+              >
+                Sign Out
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -40,37 +62,35 @@ function MainContent() {
               You&apos;re successfully authenticated! This is your camera trap field operations dashboard.
             </p>
             
-            {/* Supabase connection test */}
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">System Status</h3>
-              <SupabaseTest />
-            </div>
-
-            {/* Placeholder for future features */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-              <div className="bg-white p-6 rounded-lg shadow-sm border">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Camera Traps</h3>
-                <p className="text-gray-600">Manage your deployed camera traps</p>
-                <button className="mt-3 text-blue-600 hover:text-blue-800 font-medium">
-                  View Traps →
-                </button>
-              </div>
-              
-              <div className="bg-white p-6 rounded-lg shadow-sm border">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Deployments</h3>
-                <p className="text-gray-600">Plan and track new deployments</p>
-                <button className="mt-3 text-blue-600 hover:text-blue-800 font-medium">
-                  New Deployment →
-                </button>
-              </div>
-              
-              <div className="bg-white p-6 rounded-lg shadow-sm border">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Data Collection</h3>
-                <p className="text-gray-600">Upload and sync field data</p>
-                <button className="mt-3 text-blue-600 hover:text-blue-800 font-medium">
-                  Upload Data →
-                </button>
-              </div>
+            {/* Dashboard main actions as a responsive flex row */}
+            <div className="flex flex-col md:flex-row gap-6 items-center justify-center mt-10">
+              <button
+                onClick={() => router.push('/deployments')}
+                className="w-full max-w-md bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-lg p-8 flex flex-col items-center transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
+                style={{ minHeight: 140 }}
+              >
+                <span className="text-3xl font-bold mb-2">Deployments</span>
+                <span className="text-5xl font-mono font-extrabold mt-2">
+                  {activeDeployments === null ? '—' : activeDeployments}
+                </span>
+                <span className="text-base mt-1">active cameras</span>
+              </button>
+              <button
+                onClick={() => router.push('/inventory')}
+                className="w-full max-w-md bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-lg p-8 flex flex-col items-center transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
+                style={{ minHeight: 140 }}
+              >
+                <span className="text-3xl font-bold mb-2">Inventory</span>
+                <span className="text-lg mb-2">Track supporting equipment</span>
+              </button>
+              <button
+                onClick={() => router.push('/timeline')}
+                className="w-full max-w-md bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-lg p-8 flex flex-col items-center transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
+                style={{ minHeight: 140 }}
+              >
+                <span className="text-3xl font-bold mb-2">Timeline</span>
+                <span className="text-lg mb-2">Deployments and events</span>
+              </button>
             </div>
           </div>
         </div>

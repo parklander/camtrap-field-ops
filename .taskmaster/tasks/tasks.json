@@ -203,7 +203,54 @@
           4
         ],
         "details": "Build deployment creation interface with: predefined location selection, ad-hoc location creation, camera metadata input (ID, type, settings), GPS coordinate capture, photo capture and upload, and deployment notes. Include validation and error handling.",
-        "testStrategy": "Test deployment creation flow, GPS accuracy, photo capture, and data persistence in both online and offline modes"
+        "testStrategy": "Test deployment creation flow, GPS accuracy, photo capture, and data persistence in both online and offline modes",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create deployment location selection interface",
+            "description": "Implement the UI components for selecting predefined locations or creating ad-hoc locations for camera deployments",
+            "dependencies": [],
+            "details": "Build a form component with two tabs: 'Predefined Locations' and 'New Location'. For predefined locations, implement a searchable dropdown that fetches location data from the API. For new locations, create input fields for location name and description. Include a map component that allows users to either select a predefined location or pin a new location. Implement form validation to ensure required location data is provided.",
+            "status": "pending",
+            "testStrategy": "Unit test the form validation logic. Create component tests to verify the UI renders correctly in both predefined and new location modes. Test the map component interaction separately."
+          },
+          {
+            "id": 2,
+            "title": "Implement GPS coordinate capture functionality",
+            "description": "Create the system to capture and validate GPS coordinates either manually or through device GPS",
+            "dependencies": [],
+            "details": "Add GPS coordinate fields (latitude/longitude) to the location form. Implement a 'Get Current Location' button that uses the browser's Geolocation API to automatically populate these fields. Include manual entry option with validation for coordinate format. Display the captured coordinates on the map component. Handle permission requests for location services and provide appropriate error messages if location access is denied or unavailable.",
+            "status": "pending",
+            "testStrategy": "Mock the Geolocation API to test automatic coordinate capture. Test coordinate validation with various valid and invalid inputs. Verify map updates correctly when coordinates change."
+          },
+          {
+            "id": 3,
+            "title": "Build camera metadata input form",
+            "description": "Develop the form for entering camera-specific metadata including ID, type, and settings",
+            "dependencies": [],
+            "details": "Create a form section for camera metadata with fields for camera ID (with uniqueness validation), camera type (dropdown of supported models), and camera settings (dynamically generated based on selected camera type). Include fields for deployment-specific settings like height from ground, angle, and orientation. Implement client-side validation for all fields. Store camera presets to allow quick selection of commonly used configurations.",
+            "status": "pending",
+            "testStrategy": "Unit test the validation rules for each field. Test the dynamic form generation based on different camera types. Verify preset functionality saves and loads camera configurations correctly."
+          },
+          {
+            "id": 4,
+            "title": "Implement photo capture and upload functionality",
+            "description": "Create the interface for capturing and uploading deployment site photos with metadata",
+            "dependencies": [],
+            "details": "Build a photo capture component that allows users to either take photos using their device camera or upload existing images. Extract and store EXIF metadata from uploaded photos when available. Implement a preview gallery showing thumbnails of captured/uploaded images. Add functionality to delete or retake photos. Include progress indicators for uploads and handle network interruptions gracefully. Limit file size and types as appropriate.",
+            "status": "pending",
+            "testStrategy": "Test file upload with various image types and sizes. Verify EXIF extraction works correctly with test images containing known metadata. Test the UI for different states (loading, success, error). Simulate network failures to verify error handling."
+          },
+          {
+            "id": 5,
+            "title": "Create deployment notes and submission workflow",
+            "description": "Implement the final step of the deployment process including notes, validation, and submission",
+            "dependencies": [],
+            "details": "Add a text area for deployment notes with character count and formatting options. Implement a comprehensive validation check that verifies all required information across previous steps is complete before enabling submission. Create a review screen showing all entered information before final submission. Implement the API integration to submit the complete deployment data. Add success/failure notifications and appropriate next steps (e.g., view deployment details, create another deployment).",
+            "status": "pending",
+            "testStrategy": "Test the validation logic with various combinations of complete/incomplete data. Verify the review screen accurately displays all entered information. Mock the API to test successful submissions and various error conditions."
+          }
+        ]
       },
       {
         "id": 6,
@@ -328,6 +375,48 @@
         ],
         "details": "Implement comprehensive testing including: unit tests, integration tests, offline functionality tests, sync conflict resolution tests, and field usability testing. Create automated testing pipeline and manual testing protocols.",
         "testStrategy": "Execute full test suite, validate all user workflows, and conduct field testing with actual users"
+      },
+      {
+        "id": 16,
+        "title": "Add proper state management (Zustand or Redux Toolkit)",
+        "description": "Integrate a global state management solution such as Zustand or Redux Toolkit for app-wide state, cached data, and offline/online status.",
+        "status": "pending",
+        "priority": "medium"
+      },
+      {
+        "id": 17,
+        "title": "Implement error boundaries and better error handling",
+        "description": "Add React error boundaries and improve error handling throughout the app, including retry logic and user-friendly error messages.",
+        "status": "pending",
+        "priority": "medium"
+      },
+      {
+        "id": 18,
+        "title": "Add data validation with Zod",
+        "description": "Use Zod to validate data schemas for forms, API responses, and offline/online sync to ensure data integrity.",
+        "status": "pending",
+        "priority": "medium"
+      },
+      {
+        "id": 19,
+        "title": "Improve offline UX with better loading states",
+        "description": "Enhance the offline user experience by adding loading skeletons, optimistic UI updates, and clear feedback for sync status.",
+        "status": "pending",
+        "priority": "medium"
+      },
+      {
+        "id": 20,
+        "title": "Add bulk operations for field efficiency",
+        "description": "Implement features for logging multiple visits, updating multiple deployments, and exporting data for specific date ranges in bulk.",
+        "status": "pending",
+        "priority": "medium"
+      },
+      {
+        "id": 21,
+        "title": "Implement audit logging for data integrity",
+        "description": "Track all changes to critical data for compliance, debugging, and data integrity, including who made each change and when.",
+        "status": "pending",
+        "priority": "medium"
       }
     ],
     "metadata": {
