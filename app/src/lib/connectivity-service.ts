@@ -1,5 +1,4 @@
 import { SyncQueueService } from './sync-queue';
-import { DataService } from './data-service';
 
 export class ConnectivityService {
   private static isOnline = navigator.onLine;

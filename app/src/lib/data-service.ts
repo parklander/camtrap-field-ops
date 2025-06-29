@@ -262,12 +262,12 @@ export class DataService {
     }
     if (data) {
       const mapped = data.map((loc: unknown) => ({
-        location_id: (loc as any).location_id,
-        project_id: (loc as any).project_id,
-        location_name: (loc as any).location_name,
-        latitude: (loc as any).latitude,
-        longitude: (loc as any).longitude,
-        notes: (loc as any).location_comments || undefined,
+        location_id: (loc as Location).location_id,
+        project_id: (loc as Location).project_id,
+        location_name: (loc as Location).location_name,
+        latitude: (loc as Location).latitude,
+        longitude: (loc as Location).longitude,
+        notes: (loc as Location).location_comments || undefined,
       }));
       await db.locations.bulkPut(mapped);
     }

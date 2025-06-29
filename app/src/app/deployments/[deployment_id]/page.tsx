@@ -52,7 +52,7 @@ export default function DeploymentDetailPage({ params }: { params: { deployment_
         } else {
           setDeployment(null);
         }
-      } catch (err: any) {
+      } catch {
         setError("Failed to load deployment");
       } finally {
         setLoading(false);
