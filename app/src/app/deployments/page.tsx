@@ -291,7 +291,10 @@ export default function DeploymentsPage() {
           // Add click handler to zoom into cluster
           marker.getElement().addEventListener('click', () => {
             if (!clusterRef.current) return;
-            const clusterId = (cluster as any).id;
+            // Type guard for cluster with id
+            type ClusterWithId = typeof cluster & { id: number };
+            const clusterWithId = cluster as ClusterWithId;
+            const clusterId = clusterWithId.id;
             if (typeof clusterId !== 'number') return;
             const expansionZoom = Math.min(clusterRef.current.getClusterExpansionZoom(clusterId), 20);
             mapRef.current!.flyTo({
