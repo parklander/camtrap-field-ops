@@ -23,6 +23,8 @@ export default function DeploymentsPage() {
   const clusterRef = useRef<Supercluster | null>(null);
   const exportMenuRef = useRef<HTMLDivElement>(null);
   const [mapBounds, setMapBounds] = useState<[[number, number], [number, number]] | null>(null);
+  const userMarkerRef = useRef<mapboxgl.Marker | null>(null);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
 
   const fetchDeploymentsAndLocations = async () => {
     setDeployments(await DataService.getDeployments());
@@ -364,6 +366,66 @@ export default function DeploymentsPage() {
         );
       })
     : deployments;
+
+  // Geolocation: get user location and add marker
+  useEffect(() => {
+    if (!mapRef.current) return;
+    let watchId: number | null = null;
+    if ("geolocation" in navigator) {
+      watchId = navigator.geolocation.watchPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setUserLocation({ lat: latitude, lng: longitude });
+        },
+        (error) => {
+          // Optionally handle error (e.g., user denied)
+        },
+        { enableHighAccuracy: true }
+      );
+    }
+    return () => {
+      if (watchId !== null && navigator.geolocation.clearWatch) {
+        navigator.geolocation.clearWatch(watchId);
+      }
+      if (userMarkerRef.current) {
+        userMarkerRef.current.remove();
+        userMarkerRef.current = null;
+      }
+    };
+  }, []);
+
+  // Add or update user marker on the map
+  useEffect(() => {
+    if (!mapRef.current || !userLocation) return;
+    // Remove previous marker if exists
+    if (userMarkerRef.current) {
+      userMarkerRef.current.remove();
+      userMarkerRef.current = null;
+    }
+    // Create a custom user marker (blue dot)
+    const el = document.createElement('div');
+    el.style.width = '22px';
+    el.style.height = '22px';
+    el.style.background = '#2563eb';
+    el.style.border = '3px solid white';
+    el.style.borderRadius = '50%';
+    el.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3)';
+    el.style.display = 'flex';
+    el.style.alignItems = 'center';
+    el.style.justifyContent = 'center';
+    el.title = 'Your Location';
+    userMarkerRef.current = new mapboxgl.Marker({ element: el })
+      .setLngLat([userLocation.lng, userLocation.lat])
+      .addTo(mapRef.current);
+    // Optionally, pan/zoom to user location on first load
+    // mapRef.current.flyTo({ center: [userLocation.lng, userLocation.lat], zoom: 13 });
+    return () => {
+      if (userMarkerRef.current) {
+        userMarkerRef.current.remove();
+        userMarkerRef.current = null;
+      }
+    };
+  }, [userLocation]);
 
   return (
     <div className="max-w-2xl mx-auto py-8 px-4 bg-gray-50 min-h-screen">
