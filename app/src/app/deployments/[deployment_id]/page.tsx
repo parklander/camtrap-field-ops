@@ -12,9 +12,7 @@ import Link from 'next/link';
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_CAMTRAP_TOKEN || '';
 
-type PageProps = { params: { deployment_id: string } };
-
-export default function DeploymentDetailPage({ params }: PageProps) {
+export default function DeploymentDetailPage({ params }: { params: { deployment_id: string } }) {
   const router = useRouter();
   const deployment_id = params?.deployment_id;
   const [deployment, setDeployment] = useState<Deployment | null>(null);
