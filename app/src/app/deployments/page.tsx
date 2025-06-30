@@ -377,7 +377,7 @@ export default function DeploymentsPage() {
           const { latitude, longitude } = position.coords;
           setUserLocation({ lat: latitude, lng: longitude });
         },
-        (error) => {
+        (_error) => {
           // Optionally handle error (e.g., user denied)
         },
         { enableHighAccuracy: true }
